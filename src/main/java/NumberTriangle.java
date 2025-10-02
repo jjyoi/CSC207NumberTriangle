@@ -1,4 +1,6 @@
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This is the provided NumberTriangle class to be used in this coding task.
@@ -88,8 +90,17 @@ public class NumberTriangle {
      *
      */
     public int retrieve(String path) {
-        // TODO implement this method
-        return -1;
+        NumberTriangle tri = this;
+
+        for (int i = 0; i < path.length(); i++) {
+            char c = path.charAt(i);
+            if (c == 'l'){
+                tri = tri.left;
+            } else {
+                tri = tri.right;
+            }
+        }
+        return tri.getRoot();
     }
 
     /** Read in the NumberTriangle structure from a file.
@@ -109,22 +120,33 @@ public class NumberTriangle {
         InputStream inputStream = NumberTriangle.class.getClassLoader().getResourceAsStream(fname);
         BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
 
-
-        // TODO define any variables that you want to use to store things
-
         // will need to return the top of the NumberTriangle,
         // so might want a variable for that.
         NumberTriangle top = null;
+        List<NumberTriangle> curRow = null;
 
         String line = br.readLine();
         while (line != null) {
+            if (line.trim().isEmpty()) continue;
 
-            // remove when done; this line is included so running starter code prints the contents of the file
-            System.out.println(line);
+            String[] row = line.trim().split("\\s+");
 
-            // TODO process the line
+            List<NumberTriangle> nxtRow = new ArrayList<>(row.length);
+            for (String c : row) {
+                nxtRow.add(new NumberTriangle(Integer.parseInt(c)));
+            }
 
-            //read the next line
+            if (top == null) {
+                top = nxtRow.get(0);
+            } else {
+                for (int i = 0; i < curRow.size(); i++) {
+                    curRow.get(i).setLeft(nxtRow.get(i));
+                    curRow.get(i).setRight(nxtRow.get(i + 1));
+                }
+            }
+
+            curRow = nxtRow;
+
             line = br.readLine();
         }
         br.close();
